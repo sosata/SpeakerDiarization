@@ -8,39 +8,51 @@
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
-    <TextView android:id="@+id/fullscreen_content"
+    <TextView android:id="@+id/features"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:keepScreenOn="true"
-        android:textColor="#33b5e5"
+        android:textColor="#38ffff"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="features"
+        android:layout_gravity="top" />
+
+    <TextView android:id="@+id/output"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:keepScreenOn="true"
+        android:textColor="#38ff38"
         android:textStyle="bold"
         android:textSize="50sp"
         android:gravity="center"
-        android:text="@string/sContent" />
+        android:text="output"
+        android:layout_gravity="bottom" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
-    <FrameLayout android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+    <!--   <FrameLayout android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:fitsSystemWindows="true">
 
-        <LinearLayout android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
+           <LinearLayout android:id="@+id/fullscreen_content_controls"
+               style="?metaButtonBarStyle"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_gravity="bottom|center_horizontal"
+               android:background="@color/black_overlay"
+               android:orientation="horizontal"
+               tools:ignore="UselessParent">
 
-            <Button android:id="@+id/bListen"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/bListen" />
+               <Button android:id="@+id/bListen"
+                   style="?metaButtonBarButtonStyle"
+                   android:layout_width="0dp"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:text="@string/bListen" />
 
         </LinearLayout>
-    </FrameLayout>
+    </FrameLayout>-->
 
 </FrameLayout>

@@ -124,11 +124,11 @@ public class SignalProcessing {
     }
 
     // not in use for now
-    double[] AddWhiteNoise(double[] power) {
+    double[] AddGaussianNoise(double[] power) {
 
         double[] out = new double[power.length];
         for(int j=0; j<power.length; j++){
-            out[j] = power[j] + 0.0*noise_levels_squared[j];
+            out[j] = power[j] + 0.02*noise_levels_squared[j];
         }
         return out;
     }
@@ -201,7 +201,7 @@ public class SignalProcessing {
 
     double[] computeAutoCorrelationPeaks2(double[] power) {
 
-        double[] power_noisy = AddWhiteNoise(power);
+        double[] power_noisy = AddGaussianNoise(power);
 
         Complex[] ac_complex = fft.transform(power_noisy, TransformType.INVERSE);
 
@@ -308,12 +308,9 @@ public class SignalProcessing {
 
         }
 
-
         out[0] = maxPeak;
         out[1] = tn;
 
         return out;
-
     }
-
 }

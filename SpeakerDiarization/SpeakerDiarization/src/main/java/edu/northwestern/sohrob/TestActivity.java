@@ -5,7 +5,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.TextView;
 
 import org.apache.commons.math3.complex.Complex;
@@ -19,11 +18,16 @@ public class TestActivity extends Activity
     private static boolean _continueProcessing = true;
     private AudioRecord recorder;
     private short[] buffer;
-    private int buffersize = 1024;
-    private int fs = 8000;
+    private final int buffersize = 1024;
+    private final int fs = 8000;
     private SignalProcessing SP;
     private FastFourierTransformer fft;
+    private MFCC melfreq;
+    private double[][] MFCC_values_acc;
 
+
+    private final int delta_depth = 5;
+    private final int n_mfcc = 20;
 
 
     @Override
@@ -36,6 +40,12 @@ public class TestActivity extends Activity
 
         SP = new SignalProcessing(buffersize);
         fft = new FastFourierTransformer(DftNormalization.STANDARD);
+        melfreq = new MFCC(fs, n_mfcc, 4000, 0, buffersize);
+
+        MFCC_values_acc = new double[n_mfcc][delta_depth];
+        for (int i=0; i<n_mfcc; i++)
+            for (int j=0; j<delta_depth; j++)
+                MFCC_values_acc[i][j] = 0.0;
 
     }
 
@@ -44,8 +54,8 @@ public class TestActivity extends Activity
 
         super.onPause();
 
-        Button b = (Button)findViewById(R.id.bListen);
-        b.setText("Start Listening");
+        //Button b = (Button)findViewById(R.id.bListen);
+        //b.setText("Start Listening");
 
         TestActivity._continueProcessing = false;
 
@@ -61,8 +71,8 @@ public class TestActivity extends Activity
         recorder.startRecording();
 
         final TestActivity me = this;
-        final TextView timerTextView = (TextView) findViewById(R.id.fullscreen_content);
-
+        final TextView features_view = (TextView) findViewById(R.id.features);
+        final TextView output_view = (TextView) findViewById(R.id.output);
 
 
         Runnable r = new Runnable()
@@ -117,13 +127,36 @@ public class TestActivity extends Activity
                     //find dominant frequency
                     //double freq_max = SP.find_dominant_freq(signal, fs);
 
-                    final String txt = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f", AC[0], AC[1], rel_spec_entropy);
+                    //calculate the MFCC coefficients
+                    double[] MFCC_values = melfreq.calculateMfcc(power);
+
+                    //push MFCC values into the accumulating matrix
+                    for (int i=0; i<n_mfcc; i++) {
+                        MFCC_values_acc[i][delta_depth-1] = MFCC_values[i];
+                        for (int j=0; j<delta_depth-1; j++)
+                            MFCC_values_acc[i][j] = MFCC_values_acc[i][j+1];
+                    }
+
+                    //compute delta MFCC values
+                    double[] deltaMFCC_values = melfreq.calculate_delta(MFCC_values_acc);
+
+                    final String cls;
+                    if ((AC[0]>0.3)&&(AC[1]>10)&&(AC[1]<90)&&(rel_spec_entropy>0.2))
+                        cls = "VOICE";
+                    else
+                        cls = "";
+                    String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f", AC[0], AC[1], rel_spec_entropy);
+                    for (int i=1; i<MFCC_values.length; i++)
+                        txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i+1, MFCC_values[i], deltaMFCC_values[i]);
+
                     //long audioStop = System.currentTimeMillis();
 
+                    final String txt = txt_temp;
                     me.runOnUiThread(new Runnable()
                     {
                         public void run() {
-                            timerTextView.setText(txt);
+                            features_view.setText(txt);
+                            output_view.setText(cls);
                         }
                     });
 
