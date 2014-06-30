@@ -77,6 +77,7 @@
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
+    <orderEntry type="library" exported="" name="encog-core-3.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-4.4.52" level="project" />
     <orderEntry type="library" exported="" name="commons-math3-3.3" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-19.1.0" level="project" />

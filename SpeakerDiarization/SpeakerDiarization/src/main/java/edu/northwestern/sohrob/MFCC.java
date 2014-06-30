@@ -150,16 +150,19 @@ public class MFCC {
     // all of the samples provided here from each MFCC coefficient are used to calculate a single delta value
 
     double[] calculate_delta(double[][] data) {
+        //sum of squares of the coefficients used to estimate the derivative
+        int sum;
         double[] out = new double[data.length];
         for (int i=0; i<data.length; i++) {
             out[i] = 0;
+            sum = 0;
             for (int j = 0; j < data[0].length/2; j++) {
-                //Log.e("Test", String.format("j = %d",j));
                 out[i] += (j + 1) * data[i][(int) Math.ceil((double) (data[0].length) / 2.0) + j] - (j + 1) * data[i][data[0].length / 2 - j - 1];
+                sum += 2*(j+1)*(j+1);
             }
+            out[i] /= (double)sum;
         }
         return out;
-
     }
 
 }

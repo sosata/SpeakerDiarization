@@ -2,6 +2,12 @@
 <pre-dex-items>
 
     <item
+        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/encog-core-3.2.0-8472003dca25bffca2dde19d58dc3cf9938ec320.jar"
+        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/encog-core-3.2.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="a14e8e52bcb912e40805327b2e9c8e81a8436e41"/>
+    <item
         dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-770455fdf40ca2bec6a395f325e2f06e4189a817.jar"
         jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/classes.jar"
         jumboMode="false"

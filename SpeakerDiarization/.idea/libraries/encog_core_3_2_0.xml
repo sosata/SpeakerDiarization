@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="encog-core-3.2.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/SpeakerDiarization/libs/encog-core-3.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
