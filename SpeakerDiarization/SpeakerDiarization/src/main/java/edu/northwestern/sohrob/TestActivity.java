@@ -29,6 +29,25 @@ public class TestActivity extends Activity
     private final int delta_depth = 5;
     private final int n_mfcc = 14;
 
+    //private HiddenMarkovModel hmm;
+    //private HiddenMarkovModel hmm2;
+    private onlineHMM hmm;
+    //private ViterbiCalculator vb, vb2;
+    private final double[] mean_unvoiced = {0.22, 13.64, 0.17};
+    private final double[] mean_voiced = {0.51, 6.69, 0.31};
+    private final double[][] mean_all = {mean_unvoiced, mean_voiced};
+    private final double[][] covariance_unvoiced = {{0.0200, -0.0357, 0.0064}, {-0.0357, 164.2143, 0.0494}, {0.0064, 0.0494, 0.0191}};
+    private final double[][] covariance_voiced = {{0.0353, -0.0449, 0.0181}, {-0.0449, 27.6196, 0.2227}, {0.0181, 0.2227, 0.0270}};
+    private final double[][][] covariance_all = {covariance_unvoiced, covariance_voiced};
+    private final double[][] transition = {{0.999, 0.001}, {0.001, 0.999}};
+    private final double[] prior = {0.5,0.5};
+
+    private onlineDHMM hmm_speech;
+    private final double[][] transition_speech = {{0.99999, 0.00001}, {0.00001, 0.99999}};
+    private final double[] prior_speech = {0.5,0.5};
+    private final double[][] emission = {{1, 0},{0.25,0.75}};
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +68,34 @@ public class TestActivity extends Activity
         for (int i=0; i<n_mfcc; i++)
             for (int j=0; j<delta_depth; j++)
                 MFCC_values_acc[i][j] = 0.0;
+
+        //setting up the encog HMM:
+        /*
+        hmm = new HiddenMarkovModel(2);
+        hmm.setPi(0, 0.5);
+        hmm.setPi(1, 0.5);
+        hmm.setStateDistribution(0, new ContinousDistribution(mean_unvoiced, covariance_unvoiced));
+        hmm.setStateDistribution(1, new ContinousDistribution(mean_voiced, covariance_voiced));
+        hmm.setTransitionProbability(0, 0, 0.999);//0.9745);
+        hmm.setTransitionProbability(0, 1, 0.001);//0.0255);
+        hmm.setTransitionProbability(1, 0, 0.001);//0.0584);
+        hmm.setTransitionProbability(1, 1, 0.999);//0.9416);
+
+        hmm2 = new HiddenMarkovModel(2,2);
+        hmm2.setPi(0, 0.5);
+        hmm2.setPi(1,0.5);
+        hmm2.setStateDistribution(0, new DiscreteDistribution(new double[][]{{0.95, 0.05}}));
+        hmm2.setStateDistribution(1, new DiscreteDistribution(new double[][]{{0.5, 0.5}}));
+        hmm2.setTransitionProbability(0, 0, 0.999999);
+        hmm2.setTransitionProbability(0, 1, 0.000001);
+        hmm2.setTransitionProbability(1, 0, 0.000001);
+        hmm2.setTransitionProbability(1, 1, 0.999999);
+*/
+        hmm = new onlineHMM(2,3);
+        hmm.setParams(prior, transition, mean_all, covariance_all);
+
+        hmm_speech = new onlineDHMM(2,2);
+        hmm_speech.setParams(prior_speech, transition_speech, emission);
 
     }
 
@@ -143,14 +190,70 @@ public class TestActivity extends Activity
                                 MFCC_values_acc[i][j] = MFCC_values_acc[i][j + 1];
                         }
 
+                        //running the encog HMMs
+                        /*
+                        double[][] seq = {{AC[0],AC[1],rel_spec_entropy}};
+                        double[][] dummy = {{0,0,0}};
+                        obs = new BasicMLDataSet(seq, dummy);
+                        //vb = new ViterbiCalculator(obs, hmm);
+                        //int[] state = vb.stateSequence();
+                        int[] state = hmm.getStatesForSequence(obs);
+                        //hmm.updateProperties();
+                        //hmm.setPi(0, 1-state[0]);
+                        //hmm.setPi(1, state[0]);
+
+                        //running the second encog HMM
+                        double[][] seq2 = {{state[0]}};
+                        double[][] dummy2 = {{0}};
+                        obs2 = new BasicMLDataSet(seq2, dummy2);
+                        //vb2 = new ViterbiCalculator(obs2, hmm2);
+                        //int[] state2 = vb2.stateSequence();
+                        int[] state2 = hmm2.getStatesForSequence(obs2);
+                        //hmm2.updateProperties();
+*/
+
+
+                        //running my voice HMM
+                        double[] obs = {AC[0],AC[1],rel_spec_entropy};
+                        hmm.updateState(obs);
+                        int state_voice = hmm.getState();
+
+                        //running my speech HMM
+                        hmm_speech.updateState(state_voice);
+                        int state_speech = hmm_speech.getState();
+
+
+
                         //compute delta MFCC values
                         double[] deltaMFCC_values = melfreq.calculate_delta(MFCC_values_acc);
 
-                        final String cls;
+
+
+                        String voice = "";
+                        if (state_voice==1)
+                            voice = "VOICE";
+
+                        String speech = "";
+                        if (state_speech==1)
+                            speech = "SPEECH";
+
+                        final String out = voice+"\n"+speech;
+
+/*                        if ((state[0]==0)&&(state2[0]==0))
+                            cls = "";
+                        else if ((state[0]==1)&&(state2[0]==1))
+                            cls = "VOICE SPEECH";
+                        else if ((state[0]==0)&&(state2[0]==1))
+                            cls = "SPEECH";
+                        else
+                            cls = "VOICE";
+*/
+                        /*
                         if ((AC[0] > 0.3) && (AC[1] > 0) && (AC[1] <= 9) && (rel_spec_entropy > 0.2))
                             cls = "VOICE";
                         else
                             cls = "";
+                        */
                         String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f", AC[0], AC[1], rel_spec_entropy);
                         for (int i = 1; i < MFCC_values.length; i++)
                             txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i + 1, MFCC_values[i], deltaMFCC_values[i]);
@@ -161,7 +264,7 @@ public class TestActivity extends Activity
                         me.runOnUiThread(new Runnable() {
                             public void run() {
                                 features_view.setText(txt);
-                                output_view.setText(cls);
+                                output_view.setText(out);
                             }
                         });
 
