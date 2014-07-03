@@ -1,19 +1,14 @@
 package edu.northwestern.sohrob;
 
-import android.util.Log;
-
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
-import java.util.Arrays;
-
 /**
- * Created by sohrob on 7/1/14.
- * Online Continuous HMM
+ * Created by Sohrob on 7/3/14.
+ * Continuous Hidden Markov Model
  */
-
-public class onlineHMM {
+public class onlineCHMM {
 
     private int state;          //current state
     private double[] logPState;    //probability of each state
@@ -26,7 +21,7 @@ public class onlineHMM {
     private double[] logDenom;     //denominator for calculating likelihoods
     private double[] Pi;        //prior
 
-    public onlineHMM(int NumberOfStates, int ObservationDimension) {
+    public onlineCHMM(int NumberOfStates, int ObservationDimension) {
 
         nState = NumberOfStates;
         dimObs = ObservationDimension;
@@ -40,8 +35,10 @@ public class onlineHMM {
 
     }
 
+    //setting the HMM parameters
     public void setParams(double[] prior, double[][] transition, double[][] mean, double[][][] covariance) {
 
+        //copying arrays
         for (int i=0; i<nState; i++) {
             Pi[i] = prior[i];
             for (int j=0; j<nState; j++)
@@ -73,8 +70,8 @@ public class onlineHMM {
 
     }
 
-    //calculate the log likelihood of the observation
-    private double[] getLikelihood(double[] x) {
+    //calculate the log likelihood of the observation 'x' for each state
+    private double[] getLogLikelihood(double[] x) {
 
         double[] loglik  = new double[nState];
         for (int i=0; i<nState; i++) {
@@ -87,10 +84,10 @@ public class onlineHMM {
         return loglik;
     }
 
-    //update the state using observation x
+    //update the state using observation 'x'
     public void updateState(double[] x) {
 
-        double[] loglik = getLikelihood(x);
+        double[] loglik = getLogLikelihood(x);
         double[] PState = new double[nState];
         double[] max = new double[2];
         double temp;
@@ -115,13 +112,13 @@ public class onlineHMM {
             logPState[i] = Math.log(PState[i]);
         }
 
-        Log.e("test", "voice: "+Arrays.toString(PState));
+        //Log.e("test", "voice: " + Arrays.toString(PState));
 
         state = generateState2i(PState);
 
     }
 
-    //only for two states!!
+    //only for two states (binomial)
     private int generateState2i(double[] pState) {
 
         if (Math.random()<pState[0])
@@ -134,4 +131,5 @@ public class onlineHMM {
     public int getState() {
         return state;
     }
+
 }

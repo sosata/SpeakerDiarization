@@ -29,10 +29,7 @@ public class TestActivity extends Activity
     private final int delta_depth = 5;
     private final int n_mfcc = 14;
 
-    //private HiddenMarkovModel hmm;
-    //private HiddenMarkovModel hmm2;
-    private onlineHMM hmm;
-    //private ViterbiCalculator vb, vb2;
+    private onlineCHMM hmm_voice;
     private final double[] mean_unvoiced = {0.22, 13.64, 0.17};
     private final double[] mean_voiced = {0.51, 6.69, 0.31};
     private final double[][] mean_all = {mean_unvoiced, mean_voiced};
@@ -70,29 +67,9 @@ public class TestActivity extends Activity
                 MFCC_values_acc[i][j] = 0.0;
 
         //setting up the encog HMM:
-        /*
-        hmm = new HiddenMarkovModel(2);
-        hmm.setPi(0, 0.5);
-        hmm.setPi(1, 0.5);
-        hmm.setStateDistribution(0, new ContinousDistribution(mean_unvoiced, covariance_unvoiced));
-        hmm.setStateDistribution(1, new ContinousDistribution(mean_voiced, covariance_voiced));
-        hmm.setTransitionProbability(0, 0, 0.999);//0.9745);
-        hmm.setTransitionProbability(0, 1, 0.001);//0.0255);
-        hmm.setTransitionProbability(1, 0, 0.001);//0.0584);
-        hmm.setTransitionProbability(1, 1, 0.999);//0.9416);
 
-        hmm2 = new HiddenMarkovModel(2,2);
-        hmm2.setPi(0, 0.5);
-        hmm2.setPi(1,0.5);
-        hmm2.setStateDistribution(0, new DiscreteDistribution(new double[][]{{0.95, 0.05}}));
-        hmm2.setStateDistribution(1, new DiscreteDistribution(new double[][]{{0.5, 0.5}}));
-        hmm2.setTransitionProbability(0, 0, 0.999999);
-        hmm2.setTransitionProbability(0, 1, 0.000001);
-        hmm2.setTransitionProbability(1, 0, 0.000001);
-        hmm2.setTransitionProbability(1, 1, 0.999999);
-*/
-        hmm = new onlineHMM(2,3);
-        hmm.setParams(prior, transition, mean_all, covariance_all);
+        hmm_voice = new onlineCHMM(2,3);
+        hmm_voice.setParams(prior, transition, mean_all, covariance_all);
 
         hmm_speech = new onlineDHMM(2,2);
         hmm_speech.setParams(prior_speech, transition_speech, emission);
@@ -215,19 +192,15 @@ public class TestActivity extends Activity
 
                         //running my voice HMM
                         double[] obs = {AC[0],AC[1],rel_spec_entropy};
-                        hmm.updateState(obs);
-                        int state_voice = hmm.getState();
+                        hmm_voice.updateState(obs);
+                        int state_voice = hmm_voice.getState();
 
                         //running my speech HMM
                         hmm_speech.updateState(state_voice);
                         int state_speech = hmm_speech.getState();
 
-
-
                         //compute delta MFCC values
                         double[] deltaMFCC_values = melfreq.calculate_delta(MFCC_values_acc);
-
-
 
                         String voice = "";
                         if (state_voice==1)
@@ -248,12 +221,12 @@ public class TestActivity extends Activity
                         else
                             cls = "VOICE";
 */
-                        /*
+/*
                         if ((AC[0] > 0.3) && (AC[1] > 0) && (AC[1] <= 9) && (rel_spec_entropy > 0.2))
                             cls = "VOICE";
                         else
                             cls = "";
-                        */
+*/
                         String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f", AC[0], AC[1], rel_spec_entropy);
                         for (int i = 1; i < MFCC_values.length; i++)
                             txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i + 1, MFCC_values[i], deltaMFCC_values[i]);

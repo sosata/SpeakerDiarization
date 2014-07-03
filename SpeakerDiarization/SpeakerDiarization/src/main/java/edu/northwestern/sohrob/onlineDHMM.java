@@ -1,12 +1,10 @@
 package edu.northwestern.sohrob;
 
-import android.util.Log;
-
-import java.util.Arrays;
-
 /**
- * Created by sohrob on 7/2/14.
+ * Created by Sohrob on 7/2/14.
+ * Discrete Hidden Markov Model
  */
+
 public class onlineDHMM {
 
     private int state;          //current state
@@ -28,6 +26,7 @@ public class onlineDHMM {
 
     }
 
+    //setting the HMM parameters
     public void setParams(double[] prior, double[][] transition, double[][] emission) {
 
         for (int i=0; i<nState; i++) {
@@ -45,7 +44,7 @@ public class onlineDHMM {
 
     }
 
-    //calculate the log likelihood of the observation
+    //calculate the log likelihood of the observation 'x' for each state
     private double[] getLogLikelihood(int x) {
 
         double[] loglik  = new double[nState];
@@ -55,7 +54,7 @@ public class onlineDHMM {
         return loglik;
     }
 
-    //update the state using observation x
+    //update the state using observation 'x'
     public void updateState(int x) {
 
         double[] loglik = getLogLikelihood(x);
@@ -83,13 +82,13 @@ public class onlineDHMM {
             logPState[i] = Math.log(PState[i]);
         }
 
-        Log.e("test", "speech: "+Arrays.toString(PState));
+        //Log.e("test", "speech: "+Arrays.toString(PState));
 
         state = generateState2i(PState);
 
     }
 
-    //only for two states!!
+    //only for two states (binomial)
     private int generateState2i(double[] pState) {
 
         if (Math.random()<pState[0])
