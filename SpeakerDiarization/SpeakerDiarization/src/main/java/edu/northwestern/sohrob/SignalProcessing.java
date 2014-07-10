@@ -95,7 +95,7 @@ public class SignalProcessing {
     }
 
     public double[] zero_mean(double[] signal) {
-        double mean = 0.0;
+        double mean = 0.0f;
         for (int i=0; i<signal.length; i++)
             mean += signal[i];
         mean /= signal.length;
@@ -173,7 +173,7 @@ public class SignalProcessing {
             //spectral entropy
             if(norm_spec[i] != 0)
             {
-                spectral_entropy = spectral_entropy - norm_spec[i]*Math.log(norm_spec[i]);
+                spectral_entropy = spectral_entropy - norm_spec[i]*(double)Math.log(norm_spec[i]);
             }
 
         }
@@ -199,7 +199,7 @@ public class SignalProcessing {
                 rel_spectral_entropy += norm_spec[i] * (Math.log(norm_spec[i])-Math.log(normed_mean_spec[i]));
         }
 
-        return (float)rel_spectral_entropy;
+        return rel_spectral_entropy;
 
     }
 
@@ -287,7 +287,7 @@ public class SignalProcessing {
                 }else if(lastVal >=0 && in[i] < 0 && maxPeak > 0){
 
                     // count the last peak
-                    //autoCorPeakVal[tn] = (jfloat)localMaxPeakValue; //commented out temporarily
+                    //autoCorPeakVal[tn] = (jdouble)localMaxPeakValue; //commented out temporarily
                     //autoCorPeakLg[tn] = (jshort)localMaxPeakIndex;  //commented out temporarily
                     tn++;
 

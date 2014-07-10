@@ -45,6 +45,9 @@ public class TestActivity extends Activity
     private final double[][] emission = {{1, 0},{0.25,0.75}};
 
 
+    Yin yinpitchdetector;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,8 @@ public class TestActivity extends Activity
 
         hmm_speech = new onlineDHMM(2,2);
         hmm_speech.setParams(prior_speech, transition_speech, emission);
+
+        yinpitchdetector = new Yin(fs, framesize);
 
     }
 
@@ -137,10 +142,10 @@ public class TestActivity extends Activity
                         signal = SP.zero_mean(signal);
 
                         //hamming window
-                        signal = SP.window_hamming(signal);
+                        double[] signal_win = SP.window_hamming(signal);
 
                         //find the fft
-                        Complex[] fft_values = fft.transform(signal, TransformType.FORWARD);
+                        Complex[] fft_values = fft.transform(signal_win, TransformType.FORWARD);
 
                         //find the spectral magnitude for entropy calculation
                         double[] spec_mag = SP.spectral_magnitude(fft_values);
@@ -166,6 +171,10 @@ public class TestActivity extends Activity
                             for (int j = 0; j < delta_depth - 1; j++)
                                 MFCC_values_acc[i][j] = MFCC_values_acc[i][j + 1];
                         }
+
+
+                        //computing the pitch (YIN algorithm)
+                        double pitch = yinpitchdetector.getPitch(signal).getPitch();
 
                         //running the encog HMMs
                         /*
@@ -194,6 +203,7 @@ public class TestActivity extends Activity
                         double[] obs = {AC[0],AC[1],rel_spec_entropy};
                         hmm_voice.updateState(obs);
                         int state_voice = hmm_voice.getState();
+                        if ((pitch<40)||(pitch>500)) state_voice = 0;
 
                         //running my speech HMM
                         hmm_speech.updateState(state_voice);
@@ -227,7 +237,7 @@ public class TestActivity extends Activity
                         else
                             cls = "";
 */
-                        String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f", AC[0], AC[1], rel_spec_entropy);
+                        String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f\nPitch: %.2f", AC[0], AC[1], rel_spec_entropy, pitch);
                         for (int i = 1; i < MFCC_values.length; i++)
                             txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i + 1, MFCC_values[i], deltaMFCC_values[i]);
 
