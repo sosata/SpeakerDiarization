@@ -238,8 +238,8 @@ public class TestActivity extends Activity
                             cls = "";
 */
                         String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f\nPitch: %.2f", AC[0], AC[1], rel_spec_entropy, pitch);
-                        for (int i = 1; i < MFCC_values.length; i++)
-                            txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i + 1, MFCC_values[i], deltaMFCC_values[i]);
+                        /*for (int i = 1; i < MFCC_values.length; i++)
+                            txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i + 1, MFCC_values[i], deltaMFCC_values[i]);*/
 
                         //long audioStop = System.currentTimeMillis();
 
