@@ -125,31 +125,29 @@ public class SignalProcessing {
 
         //only using FFT_LENGTH of fourier components here since the other half
         // is a mirror and serves no purpose for calculating the entropy
-        double[] signal_out = new double[FFT_LENGTH];
+        double[] out = new double[FFT_LENGTH];
         for (int i=0; i<FFT_LENGTH; i++)
-            signal_out[i] = fftvalues[i].abs();
-        return signal_out;
+            out[i] = fftvalues[i].abs();
+        return out;
 
     }
 
     double[] spectral_power(Complex[] fftvalues)  {
-        double[] out = new double[fftvalues.length];
-        //double power_sum = 0.0;
-        for(int j=0; j<fftvalues.length; j++){
-            out[j] = fftvalues[j].abs()*fftvalues[j].abs();
-            //power_sum += out[j];
+
+        double[] out = new double[FRAME_LENGTH];
+        for(int j=0; j<FRAME_LENGTH; j++) {
+            double fftvalue_abs = fftvalues[j].abs();
+            out[j] = fftvalue_abs*fftvalue_abs;
         }
-        //Log.e("Test", "total power: "+power_sum);
         return out;
+
     }
 
-    // not in use for now
     double[] AddGaussianNoise(double[] power) {
 
         double[] out = new double[power.length];
-        for(int j=0; j<power.length; j++){
+        for(int j=0; j<power.length; j++)
             out[j] = power[j] + 0.02*noise_levels_squared[j];
-        }
         return out;
     }
 
@@ -189,7 +187,7 @@ public class SignalProcessing {
             //spectral entropy
             if(norm_spec[i] != 0)
             {
-                spectral_entropy = spectral_entropy - norm_spec[i]*(double)Math.log(norm_spec[i]);
+                spectral_entropy = spectral_entropy - norm_spec[i]*Math.log(norm_spec[i]);
             }
 
         }

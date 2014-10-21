@@ -8,11 +8,11 @@
         revision="19.1.0"
         sha1="a14e8e52bcb912e40805327b2e9c8e81a8436e41"/>
     <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-770455fdf40ca2bec6a395f325e2f06e4189a817.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/classes.jar"
+        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/opencsv-3.0-b2cdaa664e8e4a2d803dd51e8bb5d551c0907ed4.jar"
+        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/opencsv-3.0.jar"
         jumboMode="false"
-        revision="19.1.0"
-        sha1="3dfdf1db5ce5ea2999a5dcde8c8e650b02660059"/>
+        revision="20.0.0"
+        sha1="8f5f973158e0aeada6378c685753fc0261019399"/>
     <item
         dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-c12a2e66d39856e2810e2d7cfa31bff619c096e3.jar"
         jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
@@ -25,6 +25,12 @@
         jumboMode="false"
         revision="19.1.0"
         sha1="a85dc3aa929de625606270ae69a343cda69b7670"/>
+    <item
+        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-aaa4b66f911f0e7db759b055be40107bcb6241ed.jar"
+        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.google.android.gms/play-services/5.2.08/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="1ed7a7a05185651f9af41ad93711cb96b66f331c"/>
     <item
         dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/support-v4-19.1.0-15dfe337f3943750ec123c45f0a658c711609726.jar"
         jar="/home/sohrob/Android/android-sdk-linux/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
