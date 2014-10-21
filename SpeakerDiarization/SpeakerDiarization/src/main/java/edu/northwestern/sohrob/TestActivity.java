@@ -26,22 +26,31 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 public class TestActivity extends Activity
 {
-    private boolean doClassification = false;
+    private boolean doClassification = true;
+    private boolean _extractFeatures = true;
+    private boolean _doRecording = false;
+    private boolean _recordAudio = false;
+    private boolean _bufferChanged = false;
 
-    private static boolean _continueProcessing = true;
+
+    private final int framesize = 256;              // sliding frame size to do signal processing
+    private final int buffersize = 32*framesize;    // in samples - audio buffer size cannot be smaller than 640 bytes (320 samples of short)
+    //private final int overlap = 128;              // overlap between sliding frames
+    private final int fs = 8000;                    // sampling frequency
+
+    private final int delta_depth = 5;
+    private final int n_mfcc = 14;
+
+    private Thread _audioReadingThread = null;
+
     private AudioRecord recorder;
-    private short[] buffer;
-    private final int framesize = 256;  // sliding frame size to do signal processing
-    private final int buffersize = 4*framesize; // audio buffer size cannot be smaller than 640 samples
-    private final int overlap = 128;
-    private final int fs = 8000;
+    final private short[] buffer  = new short[buffersize];
+    private short[] buffer_temp;
+
     private SignalProcessing SP;
     private FastFourierTransformer fft;
     private MFCC melfreq;
     private double[][] MFCC_values_acc;
-
-    private final int delta_depth = 5;
-    private final int n_mfcc = 14;
 
     private onlineCHMM hmm_voice;
     private final double[] mean_unvoiced = {0.22, 24.0/*13.64*/, 0.17};
@@ -61,11 +70,6 @@ public class TestActivity extends Activity
     Yin yinpitchdetector;
 
     private File csv_dir;
-    private File csvFile;
-    //private CSVWriter writer;
-    private boolean _doRecording = false;
-    private String _filename = "features.csv";
-
 
     final List<String[]> features = new ArrayList<String[]>();
 
@@ -76,20 +80,24 @@ public class TestActivity extends Activity
         setContentView(R.layout.activity_main);
 
         //set up the audio recorder
-        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, fs, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, buffersize);
+        //*** NOTE: buffersize is in bytes!
+        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, fs, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, 2*buffersize);
+        buffer_temp = new short[buffersize];
 
+        //AudioFormat.CHANNEL_IN_DEFAULT
         //set up signal processing modules
         SP = new SignalProcessing(framesize);
         fft = new FastFourierTransformer(DftNormalization.STANDARD);
         melfreq = new MFCC(fs, n_mfcc, 4000, 0, framesize);
 
-        //initializing variables
+        // initializing variables
+        
         MFCC_values_acc = new double[n_mfcc][delta_depth];
         for (int i=0; i<n_mfcc; i++)
             for (int j=0; j<delta_depth; j++)
                 MFCC_values_acc[i][j] = 0.0;
 
-        //setting up the encog HMM:
+        // setting up the encog hmm:
 
         hmm_voice = new onlineCHMM(2,3);
         hmm_voice.setParams(prior, transition, mean_all, covariance_all);
@@ -99,15 +107,8 @@ public class TestActivity extends Activity
 
         yinpitchdetector = new Yin(fs, framesize);
 
-
-        //String csv = "/Download/output.csv";
-        //String csv = android.os.Environment.getDataDirectory().getAbsolutePath().toString()+"/output.csv";
-        //String csv = "output.csv";
-        //String csv = Context.content.getFilesDir().getAbsolutePath().toString()+"output.csv";
-
-
-        //File csv_dir = Environment.getExternalStorageDirectory();
-
+        // setting up the csv writer
+        
         csv_dir = this.getBaseContext().getExternalFilesDir(null);
 
         if (csv_dir==null)
@@ -117,33 +118,6 @@ public class TestActivity extends Activity
             csv_dir.mkdirs();
             Log.i("INFO","CSV directory did not exist and was created." );
         }
-
-        //this.features = new ArrayList<String[]>();
-
-
-/*
-        List<String[]> data = new ArrayList<String[]>();
-        data.add(new String[] {"Iran", "Tehran"});
-        data.add(new String[] {"United States", "Washington D.C"});
-        data.add(new String[] {"Germany", "Berlin"});
-
-        if (writer!=null) {
-
-            writer.writeAll(data);
-
-            try {
-                writer.close();
-                Log.i("INFO","CSV file written successfully." );
-                Log.i("INFO", csvFile.getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        } else {
-            Log.i("INFO", "File was NOT written.");
-            Log.i("INFO", csvFile.getAbsolutePath());
-        }
-*/
 
         //int fs_test = 16000;
         //Log.i("INF","min buffer size for "+fs_test+" Hz : "+AudioRecord.getMinBufferSize(fs_test, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT));
@@ -155,10 +129,9 @@ public class TestActivity extends Activity
 
         super.onPause();
 
-        //Button b = (Button)findViewById(R.id.bListen);
-        //b.setText("Start Listening");
+        this._extractFeatures = false;
 
-        TestActivity._continueProcessing = false;
+        this._recordAudio = false;
 
         recorder.stop();
     }
@@ -167,7 +140,7 @@ public class TestActivity extends Activity
     {
         super.onResume();
 
-        TestActivity._continueProcessing = true;
+        _extractFeatures = true;
 
 
         recorder.startRecording();
@@ -176,43 +149,52 @@ public class TestActivity extends Activity
         final TextView features_view = (TextView) findViewById(R.id.features);
         final TextView output_view = (TextView) findViewById(R.id.output);
 
+
+        _recordAudio = true;
+        if (this._audioReadingThread == null || !this._audioReadingThread.isAlive())
+        {
+            // A dead thread cannot be restarted. A new thread has to be created.
+            this._audioReadingThread = new Thread(this._audioReadingRunnable);
+            this._audioReadingThread.start();
+        }
+
+
         Runnable r = new Runnable()
         {
             public void run()
             {
-                while (TestActivity._continueProcessing)
+
+                double[][] signal = new double[buffersize/framesize][framesize];
+
+                while (_extractFeatures)
                 {
 
-                    // get audio
-
-                    buffer = new short[buffersize];
-                    recorder.read(buffer, 0, buffersize);
-
                     //if (recorder.getState() != AudioRecord.STATE_INITIALIZED) recorder.release();
+                    while (!_bufferChanged) {
+                        try {
+                            Thread.sleep(1);
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    _bufferChanged = false;
 
-                    // process audio
+                    synchronized (buffer) {
+                        for (int k = 0; k < buffersize / framesize; k++)
+                            for (int i = 0; i < framesize; i++)
+                                signal[k][i] = ((double) buffer[i + k * buffersize / framesize]) / 32767.0;
+                    }
 
-
+                    // audio feature extraction
 
                     for (int k=0; k<buffersize/framesize; k++) {
 
-                        long t1 = System.currentTimeMillis();
-
-                        double signal[] = new double[framesize];
-                        for (int i = 0; i < framesize; i++)
-                            signal[i] = ((double) buffer[i+k*buffersize/framesize]) / 32767.0;
-
-
                         //zero mean
-                        signal = SP.zero_mean(signal);
+                        double[] signal_zm = SP.zero_mean(signal[k]);
 
                         //hamming window
-                        double[] signal_win = SP.window_hamming(signal);
-
-                        //Complex[] signal_win_complex = new Complex[framesize];
-                        //for (int i=0; i<framesize; i++)
-                            //signal_win_complex[i] = new Complex(signal_win[i]);
-
+                        double[] signal_win = SP.window_hamming(signal_zm);
 
                         //calculating the fft
                         Complex[] fft_values = fft.transform(signal_win, TransformType.FORWARD);
@@ -230,7 +212,7 @@ public class TestActivity extends Activity
                         //find the AC peak number and max magnitude
                         double[] AC = SP.computeAutoCorrelationPeaks2(power);
 
-                        //find dominant frequency
+                        //find the dominant frequency band
                         //double freq_max = SP.find_dominant_freq(signal, fs);
 
                         //calculating MFCC coefficients
@@ -247,7 +229,7 @@ public class TestActivity extends Activity
                         double[] deltaMFCC_values = melfreq.calculate_delta(MFCC_values_acc);
 
                         //computing the pitch (based on YIN algorithm)
-                        double pitch = yinpitchdetector.getPitch(signal).getPitch();
+                        double pitch = yinpitchdetector.getPitch(signal[k]).getPitch();
 
                         if (doClassification) {
 
@@ -272,28 +254,23 @@ public class TestActivity extends Activity
 
                             final String out = voice + "\n" + speech;
 
-    /*                        if ((state[0]==0)&&(state2[0]==0))
+                            /*if ((state[0]==0)&&(state2[0]==0))
                                 cls = "";
                             else if ((state[0]==1)&&(state2[0]==1))
                                 cls = "VOICE SPEECH";
                             else if ((state[0]==0)&&(state2[0]==1))
                                 cls = "SPEECH";
                             else
-                                cls = "VOICE";
-    */
-    /*
-                            if ((AC[0] > 0.3) && (AC[1] > 0) && (AC[1] <= 9) && (rel_spec_entropy > 0.2))
+                                cls = "VOICE";*/
+
+                            /*if ((AC[0] > 0.3) && (AC[1] > 0) && (AC[1] <= 9) && (rel_spec_entropy > 0.2))
                                 cls = "VOICE";
                             else
-                                cls = "";
-*/
-                            String txt_temp = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f\nPitch: %.2f", AC[0], AC[1], rel_spec_entropy, pitch);
-/*                          for (int i = 1; i < MFCC_values.length; i++)
-                            txt_temp += String.format("\nMFCC%d: %.2f - %.2f", i + 1, MFCC_values[i], deltaMFCC_values[i]);*/
+                                cls = "";*/
 
-                            //long audioStop = System.currentTimeMillis();
+                            final String txt = String.format("PMAX: %.2f\nNP: %.0f\nRSE: %.2f\nPitch: %.2f", AC[0], AC[1], rel_spec_entropy, pitch);
 
-                            final String txt = txt_temp;
+                            //final String txt = txt_temp;
                             me.runOnUiThread(new Runnable() {
                                 public void run() {
                                     features_view.setText(txt);
@@ -303,26 +280,35 @@ public class TestActivity extends Activity
 
                         }
 
-                        // dumping the feature values
+                        // add new feature values to the features matrix
+
                         if (me._doRecording) {
-                            synchronized (me.features) {
-                                me.features.add(new String[]{Double.toString(AC[0]), Double.toString(AC[1]), Double.toString(rel_spec_entropy), Double.toString(pitch), Double.toString(deltaMFCC_values[0])});
+
+                            String[] feature_vector = new String[4+n_mfcc*2];
+
+                            feature_vector[0] = Double.toString(AC[0]);
+                            feature_vector[1] = Double.toString(AC[1]);
+                            feature_vector[2] = Double.toString(rel_spec_entropy);
+                            feature_vector[3] = Double.toString(pitch);
+
+                            for (int i=0; i<n_mfcc; i++) {
+                                feature_vector[i+4] = Double.toString(MFCC_values[i]);
+                                feature_vector[i+4+n_mfcc] = Double.toString(deltaMFCC_values[i]);
                             }
-                            Log.e("TEST","Recorded!");
+
+                            synchronized (me.features) {
+                                me.features.add(feature_vector);
+                            }
+
                         }
 
-                        int deltat = (int)(System.currentTimeMillis()-t1);
-                        Log.i("INF", "PT :"+deltat+" ms");
 
                     }
-
-
 
                     // broadcast results
 
                     //Log.e("TEST", "Process time (ms): " + (audioStop-audioStart));
                     //Log.e("TEST", "FFT length: " + fftvalues.length);
-
 
                 }
             }
@@ -343,6 +329,8 @@ public class TestActivity extends Activity
 
     public void onStopRecording(View view) throws InterruptedException {
 
+        String _filename = "features.csv";
+
         if (!this._doRecording) {
             return;
         }
@@ -352,7 +340,8 @@ public class TestActivity extends Activity
         final ImageButton bRecord = (ImageButton) findViewById(R.id.record);
         bRecord.setBackgroundColor(0x0000FFFF);
 
-        csvFile = new File(csv_dir, this._filename);
+        File csvFile;
+        csvFile = new File(csv_dir, _filename);
 
         CSVWriter writer = null;
         try {
@@ -390,8 +379,42 @@ public class TestActivity extends Activity
             this.features.clear();
         }
 */
-
-
     }
+
+    private Runnable _audioReadingRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+
+            while (_recordAudio) {
+
+                long T0 = System.currentTimeMillis();
+
+                recorder.read(buffer_temp, 0, buffersize);
+
+                synchronized (buffer) {
+                    System.arraycopy(buffer_temp, 0, buffer, 0, buffersize);
+                }
+
+                _bufferChanged = true;
+
+                long deltaT = System.currentTimeMillis() - T0;
+                long sleepTime = (long)(buffersize*1000/(double)fs) - deltaT;
+                if (sleepTime<0) sleepTime = 0;
+
+                try {
+                    Thread.sleep(sleepTime);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    _recordAudio = false;
+                }
+
+                Log.e("INFO", "Audio reading done!");
+
+            }
+
+        }
+    };
 
 }
