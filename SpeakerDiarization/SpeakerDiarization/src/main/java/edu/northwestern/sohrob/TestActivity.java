@@ -26,7 +26,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 
 public class TestActivity extends Activity
 {
-    private boolean doClassification = true;
+    private boolean doClassification = false;
     private boolean _extractFeatures = true;
     private boolean _doRecording = false;
     private boolean _recordAudio = false;
@@ -142,13 +142,11 @@ public class TestActivity extends Activity
 
         _extractFeatures = true;
 
-
         recorder.startRecording();
 
         final TestActivity me = this;
         final TextView features_view = (TextView) findViewById(R.id.features);
         final TextView output_view = (TextView) findViewById(R.id.output);
-
 
         _recordAudio = true;
         if (this._audioReadingThread == null || !this._audioReadingThread.isAlive())
@@ -157,7 +155,6 @@ public class TestActivity extends Activity
             this._audioReadingThread = new Thread(this._audioReadingRunnable);
             this._audioReadingThread.start();
         }
-
 
         Runnable r = new Runnable()
         {
@@ -208,6 +205,11 @@ public class TestActivity extends Activity
 
                         //calculating the power spectrum to calculate the AC
                         double[] power = SP.spectral_power(fft_values);
+
+                        //total energy of the frame
+                        double energy_total = 0.0;
+                        for (int kk=0; kk<power.length; kk++)
+                            energy_total += power[kk];
 
                         //find the AC peak number and max magnitude
                         double[] AC = SP.computeAutoCorrelationPeaks2(power);
@@ -284,16 +286,17 @@ public class TestActivity extends Activity
 
                         if (me._doRecording) {
 
-                            String[] feature_vector = new String[4+n_mfcc*2];
+                            String[] feature_vector = new String[5+n_mfcc*2];
 
                             feature_vector[0] = Double.toString(AC[0]);
                             feature_vector[1] = Double.toString(AC[1]);
                             feature_vector[2] = Double.toString(rel_spec_entropy);
                             feature_vector[3] = Double.toString(pitch);
+                            feature_vector[4] = Double.toString(energy_total);
 
                             for (int i=0; i<n_mfcc; i++) {
-                                feature_vector[i+4] = Double.toString(MFCC_values[i]);
-                                feature_vector[i+4+n_mfcc] = Double.toString(deltaMFCC_values[i]);
+                                feature_vector[i+5] = Double.toString(MFCC_values[i]);
+                                feature_vector[i+5+n_mfcc] = Double.toString(deltaMFCC_values[i]);
                             }
 
                             synchronized (me.features) {
@@ -388,6 +391,8 @@ public class TestActivity extends Activity
 
             while (_recordAudio) {
 
+                //Log.e("INFO", "Audio reading started!");
+
                 long T0 = System.currentTimeMillis();
 
                 recorder.read(buffer_temp, 0, buffersize);
@@ -410,7 +415,6 @@ public class TestActivity extends Activity
                     _recordAudio = false;
                 }
 
-                Log.e("INFO", "Audio reading done!");
 
             }
 
