@@ -2,52 +2,52 @@
 <pre-dex-items>
 
     <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-2bf2bc340466a35b7520580769470a3a5efa1c86.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="8694693636ab36910c8100ce527c258ff3ebece0"/>
-    <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-7c25a90c4b2fa880bd2d2ef226c3a39847e683dd.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar"
-        jumboMode="false"
-        revision="20.0.0"
-        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d"/>
-    <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/encog-core-3.2.0-8472003dca25bffca2dde19d58dc3cf9938ec320.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/encog-core-3.2.0.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="a14e8e52bcb912e40805327b2e9c8e81a8436e41"/>
-    <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/opencsv-3.0-b2cdaa664e8e4a2d803dd51e8bb5d551c0907ed4.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/opencsv-3.0.jar"
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/opencsv-3.0-de418970d26f14470829224f873f8058168e2e31.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/opencsv-3.0.jar"
         jumboMode="false"
         revision="20.0.0"
         sha1="8f5f973158e0aeada6378c685753fc0261019399"/>
     <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-c12a2e66d39856e2810e2d7cfa31bff619c096e3.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
-    <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-f1b97906c32a84555af7b624bb3aad0e9677ad0b.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.1.11/classes.jar"
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-11a094149be98975e952db0cf166cc76c915712b.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar"
         jumboMode="false"
         revision="20.0.0"
-        sha1="0f700f6802ba1a1f1fa7ac26d5db0666a89d75a6"/>
+        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d"/>
     <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/commons-math3-3.3-38087a5ce2a4bb25f2a83ddbe23d04bbf2c3136b.jar"
-        jar="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/commons-math3-3.3.jar"
-        jumboMode="false"
-        revision="19.1.0"
-        sha1="a85dc3aa929de625606270ae69a343cda69b7670"/>
-    <item
-        dex="/home/sohrob/Dropbox/Android/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-d6e033011dbc5f26bd1c0e3334527cfe6d128cac.jar"
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-d6e033011dbc5f26bd1c0e3334527cfe6d128cac.jar"
         jar="/home/sohrob/Android/android-sdk-linux/extras/android/m2repository/com/android/support/support-annotations/20.0.0/support-annotations-20.0.0.jar"
         jumboMode="false"
         revision="20.0.0"
         sha1="9d9013e9ff35fc3756411e62873c363c70c638fa"/>
+    <item
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-20d6d52ffc13edd7a16a32004337bea30e37a6a1.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.1.71/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="0f6d5c1ef2e982c3b7858408e3df389cf5d202da"/>
+    <item
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/encog-core-3.2.0-76803c6e8c22750f0c29880172a34e018dddb230.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/encog-core-3.2.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="a14e8e52bcb912e40805327b2e9c8e81a8436e41"/>
+    <item
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-22d1130db1ba4a1efa58530e4679eb72cacdf997.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="8694693636ab36910c8100ce527c258ff3ebece0"/>
+    <item
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/commons-math3-3.3-e519c822d8851b3ce0a823256a695793c71145f0.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/libs/commons-math3-3.3.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="a85dc3aa929de625606270ae69a343cda69b7670"/>
+    <item
+        dex="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/pre-dexed/debug/classes-4794a4fd817404aa4f41aaa38ded9f5e5de1f064.jar"
+        jar="/home/sohrob/Dropbox/Code/Java/SpeakerDiarization/SpeakerDiarization/SpeakerDiarization/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
 
 </pre-dex-items>

@@ -5,6 +5,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -118,6 +119,8 @@ public class TestActivity extends Activity
             csv_dir.mkdirs();
             Log.i("INFO","CSV directory did not exist and was created." );
         }
+
+
 
         //int fs_test = 16000;
         //Log.i("INF","min buffer size for "+fs_test+" Hz : "+AudioRecord.getMinBufferSize(fs_test, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT));
@@ -325,6 +328,9 @@ public class TestActivity extends Activity
 
         final ImageButton bRecord = (ImageButton) view;
         bRecord.setBackgroundColor(0xFF00FFFF);
+
+        String phonenumber = PhoneNumberUtils.formatNumber("13124513080");
+        Log.i("Info", "Phone number: "+phonenumber);
 
         this._doRecording = true;
 
